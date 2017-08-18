@@ -45,16 +45,16 @@ namespace iglid.Controllers
                 :"";
             var user = await GetCurrentUserAsync();
             IndexViewModel model = new IndexViewModel() { HasTeam = user.Tname != null, teams = _context.teams.OrderBy(t => t.score) };
-            if (model.teams == null)
-                return Redirect(nameof(Create));
-            return View();
+            if (model.teams.Count() == 0)
+                return Redirect("Team/" + nameof(Create));
+            return View(model);
         }
 
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var user = await GetCurrentUserAsync();
-            if (user.Tname == null)
+            if (user.Tname != null)
                 return Redirect(nameof(Index));
             return View();
         }
