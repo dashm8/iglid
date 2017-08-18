@@ -1,0 +1,47 @@
+@model iglid.Models.TeamViewModels.IndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    Name
+                </th>
+            <th>
+                Leader
+            </th>
+            <th>
+               Score
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+@foreach (var item in Model.teams) {
+        <tr>
+            <td>
+                @Html.DisplayText(item.TeamName)
+            </td>
+            <td>
+                @Html.DisplayText(item.Leader.UserName.Split('@')[0])
+            </td>
+            <td>
+                @Html.DisplayText(item.score.ToString())
+            </td>
+            <td>
+                @Html.ActionLink("Join", "Join", new { id=item.ID }) |
+                @Html.ActionLink("Profile", "Profile", new { id=item.ID })              
+            </td>
+        </tr>
+}        
+    </tbody>    
+</table>
