@@ -17,15 +17,17 @@ namespace iglid.Data
         }
         public DbSet<Team> teams { get; set; }
 
+        public void Test()
+        {
+            
+        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(builder);
+            base.OnModelCreating(builder);            
             builder.Ignore<IdentityUserLogin<string>>();
             builder.Ignore<IdentityUserRole<string>>();
             builder.Ignore<IdentityUserClaim<string>>();
             builder.Ignore<IdentityUserToken<string>>();
-            builder.Ignore<IdentityUser<string>>();
-            builder.Ignore<ApplicationUser>();
         }
     }
 }

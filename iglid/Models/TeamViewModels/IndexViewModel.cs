@@ -9,7 +9,7 @@ namespace iglid.Models.TeamViewModels
     {        
         public IEnumerable<Team> teams { get; set; }
         public bool HasTeam { get; set; }
-
+        public long TeamId { get; set; }
         public IndexViewModel() { }
 
 

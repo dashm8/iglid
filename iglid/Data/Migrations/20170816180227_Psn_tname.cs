@@ -28,7 +28,7 @@ namespace iglid.Data.Migrations
                 nullable: true);
 
             migrationBuilder.CreateTable(
-                name: "Massage",
+                name: "Massage_Team",
                 columns: table => new
                 {
                     id = table.Column<long>(nullable: false)

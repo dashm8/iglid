@@ -4,15 +4,22 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
-@Html.DisplayText(ViewData["StatusMassage"].ToString())
-@if (!Model.HasTeam) {
+<h3>@ViewData["StatusMassage"]</h3>
+@if (!Model.HasTeam)
+{
 <p class="col-md-2">
     <a asp-action="Create">Create New</a>
 </p>
 }
-
-<table class="table">
+else
+{
+    <p class="col-md-2">
+        <button type="button" class="btn btn-default"> 
+            @Html.ActionLink("My Team", "Profile", new { id = Model.TeamId })            
+        </button>
+    </p>
+}
+<table class="table table-hover">
     <thead>
         <tr>
                 <th>
@@ -32,13 +39,13 @@
 @foreach (var item in Model.teams) {
         <tr>
             <td>
-                @Html.DisplayText(item.TeamName)
+                @Html.DisplayFor(modelitem => item.TeamName)
             </td>
             <td>
-                @Html.DisplayText(item.Leader.UserName.Split('@')[0])
+                @Html.DisplayFor(modelitem => item.Leader.UserName)
             </td>
-            <td>
-                @Html.DisplayText(item.score.ToString())
+            <td>                
+                @Html.DisplayFor(modelitem => item.score)
             </td>
             <td>
                 @Html.ActionLink("Join", "Join", new { id=item.ID }) |

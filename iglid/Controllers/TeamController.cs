@@ -10,6 +10,7 @@ using iglid.Models;
 using iglid.Models.TeamViewModels;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace iglid.Controllers
 {
@@ -44,7 +45,10 @@ namespace iglid.Controllers
                 : massage == MassageId.Team404 ? "Team does not exists"
                 :"";
             var user = await GetCurrentUserAsync();
-            IndexViewModel model = new IndexViewModel() { HasTeam = user.Tname != null, teams = _context.teams.OrderBy(t => t.score) };
+            var tempteams = _context.teams.Include(x => x.Leader).OrderBy(s => s.score);
+            IndexViewModel model = new IndexViewModel() { HasTeam = user.Tname != null, teams =tempteams };
+            if (user.Tname != null)
+                model.TeamId = _context.teams.First(t => t.TeamName == user.Tname).ID;
             if (model.teams.Count() == 0)
                 return Redirect("Team/" + nameof(Create));
             return View(model);
@@ -71,6 +75,8 @@ namespace iglid.Controllers
                 CanPlay = false,
                 Leader = user
             };
+            user.Tname = model.team_name;
+            await _userManager.UpdateAsync(user);                        
             await _context.teams.AddAsync(team);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index),MassageId.TeamCreatedS);
