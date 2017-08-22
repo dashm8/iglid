@@ -38,6 +38,27 @@ namespace iglid.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult Index()
+        {
+            var user = _userManager.Users;
+            
+            return View(_userManager.Users);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Profile(string id)
+        {
+            ProfileViewModel model = new ProfileViewModel();
+            model.user = await _userManager.FindByIdAsync(id);
+            if (model.user == null)
+                return RedirectToAction(nameof(Index));
+            return View(model);
+        }
+        
+
         //
         // GET: /Account/Login
         [HttpGet]
