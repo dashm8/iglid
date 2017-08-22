@@ -73,8 +73,10 @@ namespace iglid.Controllers
             {
                 TeamName = model.team_name,
                 CanPlay = false,
-                Leader = user
+                Leader = user,
+                players = new List<ApplicationUser>()                
             };
+            team.players.Add(user);
             user.Tname = model.team_name;
             await _userManager.UpdateAsync(user);                        
             await _context.teams.AddAsync(team);
@@ -84,10 +86,16 @@ namespace iglid.Controllers
         }
 
         [HttpGet]
-        public IActionResult Profile(long id)
+        public async Task<IActionResult> Profile(long id)
         {
-            Models.Team team = _context.teams.First(t => t.ID == id);
-            return View(team);
+            Team team = _context.teams.
+                Include(x => x.Leader).
+                Include(x => x.players).
+                First(t => t.ID == id);
+            var user = await GetCurrentUserAsync();
+            bool isleader = user == team.Leader;
+            ProfileViewModel model = new ProfileViewModel() { IsCurrentUserLeader = isleader, team = team };
+            return View(model);
         }
 
         [HttpGet]
@@ -134,6 +142,40 @@ namespace iglid.Controllers
             await _userManager.UpdateAsync(user);
             return RedirectToAction(nameof(Index),MassageId.InviteSent);
         }
+
+        [HttpPost]           
+        public async Task<IActionResult> Remove(long teamid, string playerid)
+        {
+            var user = await GetCurrentUserAsync();
+            var team = await _context.teams.FindAsync(teamid);
+            if (team == null)
+                return RedirectToAction(nameof(Index), MassageId.Team404);
+            if (team.Leader != user)
+                return RedirectToAction(nameof(Index), MassageId.Error);
+            var ToRemove = await _userManager.FindByIdAsync(playerid);
+            if (ToRemove == null)
+                return RedirectToAction(nameof(Index), MassageId.Error);
+            team.players.Remove(ToRemove);
+            _context.teams.Update(team);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Profile),team.ID);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Exit(long id)
+        {
+            var user = await GetCurrentUserAsync();
+            var team = await _context.teams.FindAsync(id);
+            if (!team.players.Exists(x => x == user))
+                return RedirectToAction(nameof(Index), MassageId.Error);
+            if (team.Leader == user)
+                return RedirectToAction(nameof(Index), MassageId.ExitF);
+            team.players.Remove(user);
+            _context.teams.Update(team);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index), MassageId.Exit);
+        }
+
         #region helpers
 
         private Task<ApplicationUser> GetCurrentUserAsync()
@@ -149,6 +191,8 @@ namespace iglid.Controllers
             InviteSendF,
             Join,
             JoinF,
+            Exit,
+            ExitF,
             Team404,
             Error
         }

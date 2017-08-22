@@ -13,6 +13,5 @@ namespace iglid.Models
         public int score { get; set; }
         public string Tname { get; set; }
         public List<Massage> massages { get; set; }
-
     }
 }

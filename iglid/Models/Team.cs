@@ -17,6 +17,7 @@ namespace iglid.Models
 
         public Team()
         {
+           
         }
     }
 }

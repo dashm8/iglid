@@ -105,7 +105,7 @@ namespace iglid.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, score = 1000};
+                var user = new ApplicationUser { UserName = model.Email.Split('@')[0], Email = model.Email, score = 1000};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
