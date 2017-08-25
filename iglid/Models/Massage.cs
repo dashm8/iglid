@@ -10,17 +10,17 @@ namespace iglid.Models
         public long id { get; set; }        
         public string content { get; set; }
         public ApplicationUser sender { get; set; }
-        public long teamid { get; set; }
+        public Team team{ get; set; }
 
         public Massage()
         {
 
         }
-        public Massage(string content, ApplicationUser sender, long teamid)
+        public Massage(string content, ApplicationUser sender, Team teamid)
         {
             this.content = content;
             this.sender = sender;
-            this.teamid = teamid;
+            this.team = teamid;
         }
     }
 

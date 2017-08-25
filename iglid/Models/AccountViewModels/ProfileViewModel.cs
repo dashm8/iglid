@@ -8,5 +8,6 @@ namespace iglid.Models.AccountViewModels
     public class ProfileViewModel
     {
         public ApplicationUser user { get; set; }
+        public bool IsMe { get; set; }
     }
 }

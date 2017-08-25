@@ -11,7 +11,8 @@ namespace iglid.Models
         public string TeamName { get; set; }
         public ApplicationUser Leader { get; set; }
         public virtual List<ApplicationUser> players { get; set; }
-        public virtual List<Requests> requests { get; set; }        
+        public virtual List<Requests> requests { get; set; }  
+        public virtual List<Match> matches { get; set; }
         public int score { get; set; }
         public bool CanPlay { get; set; }
 

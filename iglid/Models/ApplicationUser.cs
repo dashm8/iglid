@@ -12,6 +12,7 @@ namespace iglid.Models
         public string PSN { get; set; }
         public int score { get; set; }
         public string Tname { get; set; }
-        public List<Massage> massages { get; set; }
+        public virtual List<Massage> massages { get; set; }
+        public virtual List<Match> matches { get; set; }
     }
 }

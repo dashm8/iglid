@@ -1,0 +1,52 @@
+@model IEnumerable<iglid.Models.Massage>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h2>Privete Massages</h2>
+
+<p>
+    <a asp-action="profile">Back To Profile</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                team
+            </th>
+            <th>
+                leader
+            </th>
+            <th>
+                content
+            </th>
+            <th>
+                score
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.ActionLink(item.team.TeamName,'Profile','Team',{id = item.team.ID})
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.team.Leader)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.content)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.team.score)
+            </td>
+            <td>
+                @Html.ActionLink("Join", "Join", new { id=item.id  }) |
+                @Html.ActionLink("Decline", "Decline", new { id=item.id}) |
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

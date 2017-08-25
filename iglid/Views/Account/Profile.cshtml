@@ -1,44 +1,35 @@
-@model iglid.Models.ApplicationUser
+@model iglid.Models.AccountViewModels.ProfileViewModel
 
 @{
     ViewData["Title"] = "Profile";
 }
 
 <h2>Profile</h2>
+@if (Model.IsMe) { 
+    @Html.ActionLink("Massages", "Massages",new {id = Model.user.Id })<span class="badge">@Html.DisplayFor(model => model.user.massages.Count)</span>
 
+}
 <div>
-    <h4>@Html.DisplayFor(model => model.UserName)</h4>
+    <h4>@Html.DisplayFor(model => model.user.UserName)</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
-            @Html.DisplayNameFor(model => model.PSN)
+            @Html.DisplayNameFor(model => model.user.PSN)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.PSN)
+            @Html.DisplayFor(model => model.user.PSN)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.score)
+            @Html.DisplayNameFor(model => model.user.score)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.score)
+            @Html.DisplayFor(model => model.user.score)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.Tname)
+            @Html.DisplayNameFor(model => model.user.Tname)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.Tname)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Id)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Id)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.UserName)
+            @Html.DisplayFor(model => model.user.Tname)
         </dd>
     </dl>
 </div>

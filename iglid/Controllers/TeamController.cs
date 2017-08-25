@@ -43,6 +43,7 @@ namespace iglid.Controllers
                 : massage == MassageId.InviteSendF ? "Cannot send invite"
                 : massage == MassageId.Error ? "an error has occured"
                 : massage == MassageId.Team404 ? "Team does not exists"
+                : massage == MassageId.TeamDeletedS ? "Your team was deleted"
                 :"";
             var user = await GetCurrentUserAsync();
             var tempteams = _context.teams.Include(x => x.Leader).OrderBy(s => s.score);
@@ -52,6 +53,16 @@ namespace iglid.Controllers
             if (model.teams.Count() == 0)
                 return Redirect("Team/" + nameof(Create));
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Massages(long id)
+        {
+            var user = await GetCurrentUserAsync();
+            var team = _context.teams.Find(id);
+            if (user != team.Leader)
+                return NotFound();
+            return View(team.requests);
         }
 
         [HttpGet]
@@ -76,6 +87,9 @@ namespace iglid.Controllers
                 Leader = user,
                 players = new List<ApplicationUser>()                
             };
+            var temp = await _context.teams.FindAsync(model.team_name);
+            if (temp == null)
+                RedirectToAction(nameof(Index),MassageId.Error);
             team.players.Add(user);
             user.Tname = model.team_name;
             await _userManager.UpdateAsync(user);                        
@@ -86,6 +100,7 @@ namespace iglid.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Profile(long id)
         {
             Team team = _context.teams.
@@ -114,7 +129,7 @@ namespace iglid.Controllers
             Requests request = new Requests(user, model.massage);
             team.requests.Add(request);
             _context.teams.Update(team);
-            int x = await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index),MassageId.Join);
         }
 
@@ -131,10 +146,12 @@ namespace iglid.Controllers
         [HttpPost]
         public async Task<IActionResult> Invite(long id, InviteViewModel model)
         {
+            var team = _context.teams.Find(id);
             Massage msg = new Massage(model.massage,
                 await GetCurrentUserAsync(),
-               id);
-            var team = await _context.teams.FindAsync(id);
+               team);
+            if (team == null)
+                return NotFound();
             if (team.players.Count > 3)
                 return RedirectToAction(nameof(Index),MassageId.InviteSendF);
             var user = await _userManager.FindByIdAsync(model.invite.Id);
@@ -176,6 +193,51 @@ namespace iglid.Controllers
             return RedirectToAction(nameof(Index), MassageId.Exit);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(long id)
+        {
+            var team = await _context.teams.FindAsync(id);
+            if (team == null)
+                return NotFound();
+            var user = await GetCurrentUserAsync();
+            if (team.Leader != user)
+                return NotFound();
+            _context.teams.Remove(team);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index),MassageId.TeamDeletedS);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Accept(long id)
+        {
+            var user = await GetCurrentUserAsync();
+            var team = _context.teams.Find(user.Tname);            
+            if (user.Tname == null || team == null || team.players.Count == 4)
+                return NotFound();
+            var massage = team.requests.Find(x => x.ID == id);
+            team.players.Add(massage.sender);
+            team.requests.Remove(massage);
+            massage.sender.Tname = team.TeamName;
+            if (team.players.Count == 4) { 
+                team.CanPlay = true;
+                team.score = team.players.Sum(x => x.score) / 4;
+            }
+            _context.teams.Update(team);
+            await _userManager.UpdateAsync(massage.sender);
+            return RedirectToAction(nameof(Massages), team.ID);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Decline(long id)
+        {
+            var user = await GetCurrentUserAsync();
+            var team = _context.teams.Find(user.Tname);
+            var req = team.requests.Find(x => x.ID == id);
+            team.requests.Remove(req);
+            return RedirectToAction(nameof(Massages), team.ID);
+        }
+
         #region helpers
 
         private Task<ApplicationUser> GetCurrentUserAsync()
@@ -187,6 +249,7 @@ namespace iglid.Controllers
         {
             TeamCreatedS,
             TeamCreatedF,
+            TeamDeletedS,
             InviteSent,
             InviteSendF,
             Join,

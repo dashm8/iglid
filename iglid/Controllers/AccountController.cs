@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using iglid.Models;
 using iglid.Models.AccountViewModels;
 using iglid.Services;
+using iglid.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace iglid.Controllers
 {
@@ -20,6 +22,7 @@ namespace iglid.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly TeamContext _teamContext;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
@@ -29,8 +32,10 @@ namespace iglid.Controllers
             SignInManager<ApplicationUser> signInManager,
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            TeamContext teamContext)
         {
+            _teamContext = teamContext;
             _userManager = userManager;
             _signInManager = signInManager;
             _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
@@ -38,27 +43,72 @@ namespace iglid.Controllers
             _logger = loggerFactory.CreateLogger<AccountController>();
         }
 
+        //leaderboard
         [HttpGet]
         [AllowAnonymous]
         public IActionResult Index()
         {
-            var user = _userManager.Users;
-            
+            var user = _userManager.Users.OrderBy(x => x.score);            
             return View(_userManager.Users);
         }
 
+        //player profile
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Profile(string id)
         {
             ProfileViewModel model = new ProfileViewModel();
             model.user = await _userManager.FindByIdAsync(id);
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            model.IsMe = user == model.user;
             if (model.user == null)
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             return View(model);
         }
-        
 
+        //player massages
+        [HttpGet]
+        public async Task<IActionResult> Massages(string id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            if (user.Id != id)
+                return NotFound();
+            return View(user.massages);
+        }
+
+        //join a team by massage
+        [HttpPost]
+        public async Task<IActionResult> Join(long id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);            
+            var massage = user.massages.Find(x => x.id == id);
+            var team = massage.team;
+            var tempteam = _teamContext.teams.Find(team.ID);
+            if (tempteam == null)
+                return NotFound();
+            if (team.players.Count == 4)
+                return NotFound();//team is full
+            team.players.Add(user);
+            if (team.players.Count == 4)
+                team.CanPlay = true;
+            _teamContext.Update(team);
+            await _teamContext.SaveChangesAsync();
+            user.Tname = team.TeamName;
+            await _userManager.UpdateAsync(user);            
+            return RedirectToAction(nameof(Profile));
+        }
+
+        //decline invite
+        [HttpPost]
+        public async Task<IActionResult> Decline(long id)
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            var massage = user.massages.Find(x => x.id == id);
+            user.massages.Remove(massage);
+            await _userManager.UpdateAsync(user);
+            return RedirectToAction(nameof(Massages),user.Id);
+        }
+        
         //
         // GET: /Account/Login
         [HttpGet]

@@ -11,16 +11,12 @@ namespace iglid.Data
 {
     public class TeamContext : DbContext    
     {
-        public TeamContext(DbContextOptions options) : base(options)
+        public TeamContext(DbContextOptions<TeamContext> options) : base(options)
         {
             
         }
         public DbSet<Team> teams { get; set; }
 
-        public void Test()
-        {
-            
-        }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);            

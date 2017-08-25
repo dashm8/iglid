@@ -1,0 +1,53 @@
+@model IEnumerable<iglid.Models.Requests>
+
+@{
+    ViewData["Title"] = "Massages";
+}
+
+<h2>Massages</h2>
+
+<p>
+    <a asp-action="Profile">Back To Profile</a>
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>
+                team
+            </th>
+            <th>
+                PSN
+            </th>
+            <th>
+                content
+            </th>
+            <th>
+                score
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.ActionLink(item.sender.UserName,"Profile","Account",new {id = item.sender.Id})
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.sender.PSN)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.massage)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.sender.score)
+                </td>
+                <td>
+                    @Html.ActionLink("Accept", "Accept", new { id=item.ID  }) |
+                    @Html.ActionLink("Decline", "Decline", new { id=item.ID}) |
+                </td>
+            </tr>
+}
+    </tbody>
+</table>
+

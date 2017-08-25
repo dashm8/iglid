@@ -15,7 +15,9 @@
     </p>
     @if(Model.IsCurrentUserLeader){
     <div class="right">
-        @Html.ActionLink("Edit", "Edit", new {id = Model.team.ID})
+        @Html.ActionLink("Massages", "Massages", new {id = Model.team.ID})<span class="badge">
+        @Html.DisplayFor(model => model.team.requests.Count)
+        </span>
     </div>
     }else{
         @Html.ActionLink("Exit", "Exit",new {id = Model.team.ID})
@@ -37,7 +39,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (var item in Model.teams.players) {
+                @foreach (var item in Model.team.players) {
                     <tr>
                         <td>
                             @Html.DisplayFor(modelitem => item.UserName)
