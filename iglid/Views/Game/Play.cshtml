@@ -1,0 +1,45 @@
+@model IEnumerable<iglid.Models.Match>
+
+@{
+    ViewData["Title"] = "Play";
+}
+
+<h2>Play</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table table-hover">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.date)
+                </th>                
+                <th>
+                    @Html.DisplayNameFor(model => model.bestof)
+                </th>               
+                <th>
+                    @Html.DisplayNameFor(model => model.modes)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.date)
+            </td>            
+            <td>
+                @Html.DisplayFor(modelItem => item.bestof)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.modes)
+            </td>
+            <td>
+                @Html.ActionLink("Play", "Join", new { /* id=item.PrimaryKey */ })              
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
