@@ -5,14 +5,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace iglid.Data.Migrations
 {
-    public partial class Update : Migration
+    public partial class Update002 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Tname",
-                table: "AspNetUsers");
-
             migrationBuilder.RenameColumn(
                 name: "teamid",
                 table: "Massage",
@@ -22,23 +18,19 @@ namespace iglid.Data.Migrations
                 name: "teamID",
                 table: "Massage",
                 nullable: true,
-                oldClrType: typeof(long));                   
+                oldClrType: typeof(long));
+
 
             migrationBuilder.CreateIndex(
-                name: "IX_Team_LeaderId",
-                table: "Team",
-                column: "LeaderId",
-                unique: true);
+                name: "IX_AspNetUsers_TeamID",
+                table: "AspNetUsers",
+                column: "TeamID");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_AspNetUsers_Team_TeamID",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_AspNetUsers_Team_teamID",
                 table: "AspNetUsers");
 
             migrationBuilder.DropForeignKey(
@@ -59,16 +51,8 @@ namespace iglid.Data.Migrations
                 name: "IX_AspNetUsers_TeamID",
                 table: "AspNetUsers");
 
-            migrationBuilder.DropIndex(
-                name: "IX_AspNetUsers_teamID",
-                table: "AspNetUsers");
-
             migrationBuilder.DropColumn(
                 name: "TeamID",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "teamID",
                 table: "AspNetUsers");
 
             migrationBuilder.RenameColumn(

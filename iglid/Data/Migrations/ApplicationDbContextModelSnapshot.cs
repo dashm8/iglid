@@ -51,7 +51,7 @@ namespace iglid.Data.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<string>("Tname");
+                    b.Property<long?>("TeamID");
 
                     b.Property<bool>("TwoFactorEnabled");
 
@@ -69,6 +69,8 @@ namespace iglid.Data.Migrations
                         .IsUnique()
                         .HasName("UserNameIndex");
 
+                    b.HasIndex("TeamID");
+
                     b.ToTable("AspNetUsers");
                 });
 
@@ -81,13 +83,56 @@ namespace iglid.Data.Migrations
 
                     b.Property<string>("senderId");
 
-                    b.Property<long>("teamid");
+                    b.Property<long?>("teamID");
 
                     b.HasKey("id");
 
                     b.HasIndex("senderId");
 
+                    b.HasIndex("teamID");
+
                     b.ToTable("Massage");
+                });
+
+            modelBuilder.Entity("iglid.Models.Requests", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<long?>("TeamID");
+
+                    b.Property<string>("massage");
+
+                    b.Property<string>("senderId");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("TeamID");
+
+                    b.HasIndex("senderId");
+
+                    b.ToTable("Requests");
+                });
+
+            modelBuilder.Entity("iglid.Models.Team", b =>
+                {
+                    b.Property<long>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("CanPlay");
+
+                    b.Property<string>("LeaderId");
+
+                    b.Property<string>("TeamName");
+
+                    b.Property<int>("score");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("LeaderId")
+                        .IsUnique();
+
+                    b.ToTable("Team");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRole", b =>
@@ -197,11 +242,40 @@ namespace iglid.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("iglid.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("iglid.Models.Team")
+                        .WithMany("players")
+                        .HasForeignKey("TeamID");
+                });
+
             modelBuilder.Entity("iglid.Models.Massage", b =>
                 {
                     b.HasOne("iglid.Models.ApplicationUser", "sender")
                         .WithMany("massages")
                         .HasForeignKey("senderId");
+
+                    b.HasOne("iglid.Models.Team", "team")
+                        .WithMany()
+                        .HasForeignKey("teamID");
+                });
+
+            modelBuilder.Entity("iglid.Models.Requests", b =>
+                {
+                    b.HasOne("iglid.Models.Team")
+                        .WithMany("requests")
+                        .HasForeignKey("TeamID");
+
+                    b.HasOne("iglid.Models.ApplicationUser", "sender")
+                        .WithMany()
+                        .HasForeignKey("senderId");
+                });
+
+            modelBuilder.Entity("iglid.Models.Team", b =>
+                {
+                    b.HasOne("iglid.Models.ApplicationUser", "Leader")
+                        .WithOne("team")
+                        .HasForeignKey("iglid.Models.Team", "LeaderId");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityRoleClaim<string>", b =>

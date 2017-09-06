@@ -4,13 +4,12 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using iglid.Data;
-using iglid.Models;
 
 namespace iglid.Migrations
 {
-    [DbContext(typeof(TeamContext))]
-    [Migration("20170830140713_Update")]
-    partial class Update
+    [DbContext(typeof(GameContext))]
+    [Migration("20170831091530_Update001")]
+    partial class Update001
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,8 +48,6 @@ namespace iglid.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<long?>("TeamID");
-
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName");
@@ -60,8 +57,6 @@ namespace iglid.Migrations
                     b.Property<long?>("teamID");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TeamID");
 
                     b.HasIndex("teamID");
 
@@ -86,38 +81,6 @@ namespace iglid.Migrations
                     b.HasIndex("teamID");
 
                     b.ToTable("Massage");
-                });
-
-            modelBuilder.Entity("iglid.Models.Match", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("ApplicationUserId");
-
-                    b.Property<int>("bestof");
-
-                    b.Property<DateTime>("date");
-
-                    b.Property<int>("maps");
-
-                    b.Property<int>("modes");
-
-                    b.Property<int>("outcome");
-
-                    b.Property<long?>("t1ID");
-
-                    b.Property<long?>("t2ID");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("t1ID");
-
-                    b.HasIndex("t2ID");
-
-                    b.ToTable("matches");
                 });
 
             modelBuilder.Entity("iglid.Models.Requests", b =>
@@ -149,8 +112,6 @@ namespace iglid.Migrations
 
                     b.Property<string>("LeaderId");
 
-                    b.Property<string>("MatchId");
-
                     b.Property<string>("TeamName");
 
                     b.Property<int>("score");
@@ -160,19 +121,13 @@ namespace iglid.Migrations
                     b.HasIndex("LeaderId")
                         .IsUnique();
 
-                    b.HasIndex("MatchId");
-
                     b.ToTable("teams");
                 });
 
             modelBuilder.Entity("iglid.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("iglid.Models.Team")
-                        .WithMany("players")
-                        .HasForeignKey("TeamID");
-
                     b.HasOne("iglid.Models.Team", "team")
-                        .WithMany()
+                        .WithMany("players")
                         .HasForeignKey("teamID");
                 });
 
@@ -185,21 +140,6 @@ namespace iglid.Migrations
                     b.HasOne("iglid.Models.Team", "team")
                         .WithMany()
                         .HasForeignKey("teamID");
-                });
-
-            modelBuilder.Entity("iglid.Models.Match", b =>
-                {
-                    b.HasOne("iglid.Models.ApplicationUser")
-                        .WithMany("matches")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("iglid.Models.Team", "t1")
-                        .WithMany()
-                        .HasForeignKey("t1ID");
-
-                    b.HasOne("iglid.Models.Team", "t2")
-                        .WithMany()
-                        .HasForeignKey("t2ID");
                 });
 
             modelBuilder.Entity("iglid.Models.Requests", b =>
@@ -218,10 +158,6 @@ namespace iglid.Migrations
                     b.HasOne("iglid.Models.ApplicationUser", "Leader")
                         .WithOne()
                         .HasForeignKey("iglid.Models.Team", "LeaderId");
-
-                    b.HasOne("iglid.Models.Match")
-                        .WithMany("temp")
-                        .HasForeignKey("MatchId");
                 });
         }
     }

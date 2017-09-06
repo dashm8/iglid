@@ -17,12 +17,12 @@ namespace iglid.Controllers
     [Authorize]
     public class TeamController : Controller
     {
-        private readonly TeamContext _context;
+        private readonly GameContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
 
 
-        public TeamController(TeamContext context,
+        public TeamController(GameContext context,
             UserManager<ApplicationUser> usermanager
             , IEmailSender email)
         {
@@ -47,9 +47,9 @@ namespace iglid.Controllers
                 :"";
             var user = await GetCurrentUserAsync();
             var tempteams = _context.teams.Include(x => x.Leader).OrderBy(s => s.score);
-            IndexViewModel model = new IndexViewModel() { HasTeam = user.Tname != null, teams =tempteams };
-            if (user.Tname != null)
-                model.TeamId = _context.teams.First(t => t.TeamName == user.Tname).ID;
+            IndexViewModel model = new IndexViewModel() { HasTeam = user.team != null, teams =tempteams };
+            if (user.team != null)
+                model.TeamId = user.team.ID;
             if (model.teams.Count() == 0)
                 return Redirect("Team/" + nameof(Create));
             return View(model);
@@ -69,7 +69,7 @@ namespace iglid.Controllers
         public async Task<IActionResult> Create()
         {
             var user = await GetCurrentUserAsync();
-            if (user.Tname != null)
+            if (user.team != null)
                 return Redirect(nameof(Index));
             return View();
         }
@@ -78,7 +78,7 @@ namespace iglid.Controllers
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             var user = await GetCurrentUserAsync();
-            if (user.Tname != null)
+            if (user.team != null)
                 return RedirectToAction(nameof(Index),MassageId.TeamCreatedF);
             Team team = new Team()
             {
@@ -91,7 +91,7 @@ namespace iglid.Controllers
             if (temp == null)
                 RedirectToAction(nameof(Index),MassageId.Error);
             team.players.Add(user);
-            user.Tname = model.team_name;
+            user.team = team;
             await _userManager.UpdateAsync(user);                        
             await _context.teams.AddAsync(team);
             await _context.SaveChangesAsync();
@@ -211,13 +211,13 @@ namespace iglid.Controllers
         public async Task<IActionResult> Accept(long id)
         {
             var user = await GetCurrentUserAsync();
-            var team = _context.teams.Find(user.Tname);            
-            if (user.Tname == null || team == null || team.players.Count == 4)
+            var team = user.team;         
+            if (user.team == null || team.players.Count == 4)
                 return NotFound();
             var massage = team.requests.Find(x => x.ID == id);
             team.players.Add(massage.sender);
             team.requests.Remove(massage);
-            massage.sender.Tname = team.TeamName;
+            massage.sender.team = team;
             if (team.players.Count == 4) { 
                 team.CanPlay = true;
                 team.score = team.players.Sum(x => x.score) / 4;
@@ -232,7 +232,7 @@ namespace iglid.Controllers
         public async Task<IActionResult> Decline(long id)
         {
             var user = await GetCurrentUserAsync();
-            var team = _context.teams.Find(user.Tname);
+            var team = user.team;
             var req = team.requests.Find(x => x.ID == id);
             team.requests.Remove(req);
             return RedirectToAction(nameof(Massages), team.ID);

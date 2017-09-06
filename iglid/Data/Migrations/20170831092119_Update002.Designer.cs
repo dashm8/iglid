@@ -8,8 +8,8 @@ using iglid.Data;
 namespace iglid.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170830144134_Update")]
-    partial class Update
+    [Migration("20170831092119_Update002")]
+    partial class Update002
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -61,8 +61,6 @@ namespace iglid.Data.Migrations
 
                     b.Property<int>("score");
 
-                    b.Property<long?>("teamID");
-
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -73,8 +71,6 @@ namespace iglid.Data.Migrations
                         .HasName("UserNameIndex");
 
                     b.HasIndex("TeamID");
-
-                    b.HasIndex("teamID");
 
                     b.ToTable("AspNetUsers");
                 });
@@ -252,10 +248,6 @@ namespace iglid.Data.Migrations
                     b.HasOne("iglid.Models.Team")
                         .WithMany("players")
                         .HasForeignKey("TeamID");
-
-                    b.HasOne("iglid.Models.Team", "team")
-                        .WithMany()
-                        .HasForeignKey("teamID");
                 });
 
             modelBuilder.Entity("iglid.Models.Massage", b =>
@@ -283,7 +275,7 @@ namespace iglid.Data.Migrations
             modelBuilder.Entity("iglid.Models.Team", b =>
                 {
                     b.HasOne("iglid.Models.ApplicationUser", "Leader")
-                        .WithOne()
+                        .WithOne("team")
                         .HasForeignKey("iglid.Models.Team", "LeaderId");
                 });
 

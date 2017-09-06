@@ -9,6 +9,8 @@ namespace iglid.Models.GameViewModels
     {
         public int t1score { get; set; }
         public int t2score { get; set; }
-
+        public string t1name { get; set; }
+        public string t2name { get; set; }
+        public ReportViewModel() { }
     }
 }

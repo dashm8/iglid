@@ -9,10 +9,8 @@ namespace iglid.Models
 {
     public class Match
     {
-        public string Id { get; set; }               
-        public long Team1Id { get; set; }
-        public virtual Team t1 { get; set; }        
-        public long Team2Id;
+        public string Id { get; set; }    
+        public virtual Team t1 { get; set; }  
         public virtual Team t2 { get; set; }
         public DateTime date { get; set; }
         public int t1score { get; set; }

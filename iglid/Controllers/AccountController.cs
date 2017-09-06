@@ -22,7 +22,7 @@ namespace iglid.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly TeamContext _teamContext;
+        private readonly GameContext _teamContext;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
@@ -33,7 +33,7 @@ namespace iglid.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ILoggerFactory loggerFactory,
-            TeamContext teamContext)
+            GameContext teamContext)
         {
             _teamContext = teamContext;
             _userManager = userManager;
@@ -93,7 +93,7 @@ namespace iglid.Controllers
                 team.CanPlay = true;
             _teamContext.Update(team);
             await _teamContext.SaveChangesAsync();
-            user.Tname = team.TeamName;
+            user.team = team;
             await _userManager.UpdateAsync(user);            
             return RedirectToAction(nameof(Profile));
         }
@@ -138,6 +138,9 @@ namespace iglid.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    if (user.IsAdmin)
+                        RedirectToAction("Index", "Admin");
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.IsLockedOut)
@@ -176,7 +179,7 @@ namespace iglid.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email.Split('@')[0], Email = model.Email, score = 1000};
+                var user = new ApplicationUser { UserName = model.Email.Split('@')[0], Email = model.Email,IsAdmin=false, score = 1000};
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

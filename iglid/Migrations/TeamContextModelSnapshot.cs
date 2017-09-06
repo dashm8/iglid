@@ -7,7 +7,7 @@ using iglid.Data;
 
 namespace iglid.Migrations
 {
-    [DbContext(typeof(TeamContext))]
+    [DbContext(typeof(GameContext))]
     partial class TeamContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -47,19 +47,17 @@ namespace iglid.Migrations
 
                     b.Property<string>("SecurityStamp");
 
-                    b.Property<long?>("TeamID");
-
-                    b.Property<string>("Tname");
-
                     b.Property<bool>("TwoFactorEnabled");
 
                     b.Property<string>("UserName");
 
                     b.Property<int>("score");
 
+                    b.Property<long?>("teamID");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("TeamID");
+                    b.HasIndex("teamID");
 
                     b.ToTable("ApplicationUser");
                 });
@@ -73,11 +71,13 @@ namespace iglid.Migrations
 
                     b.Property<string>("senderId");
 
-                    b.Property<long>("teamid");
+                    b.Property<long?>("teamID");
 
                     b.HasKey("id");
 
                     b.HasIndex("senderId");
+
+                    b.HasIndex("teamID");
 
                     b.ToTable("Massage");
                 });
@@ -117,16 +117,17 @@ namespace iglid.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("LeaderId");
+                    b.HasIndex("LeaderId")
+                        .IsUnique();
 
                     b.ToTable("teams");
                 });
 
             modelBuilder.Entity("iglid.Models.ApplicationUser", b =>
                 {
-                    b.HasOne("iglid.Models.Team")
+                    b.HasOne("iglid.Models.Team", "team")
                         .WithMany("players")
-                        .HasForeignKey("TeamID");
+                        .HasForeignKey("teamID");
                 });
 
             modelBuilder.Entity("iglid.Models.Massage", b =>
@@ -134,6 +135,10 @@ namespace iglid.Migrations
                     b.HasOne("iglid.Models.ApplicationUser", "sender")
                         .WithMany("massages")
                         .HasForeignKey("senderId");
+
+                    b.HasOne("iglid.Models.Team", "team")
+                        .WithMany()
+                        .HasForeignKey("teamID");
                 });
 
             modelBuilder.Entity("iglid.Models.Requests", b =>
@@ -150,8 +155,8 @@ namespace iglid.Migrations
             modelBuilder.Entity("iglid.Models.Team", b =>
                 {
                     b.HasOne("iglid.Models.ApplicationUser", "Leader")
-                        .WithMany()
-                        .HasForeignKey("LeaderId");
+                        .WithOne()
+                        .HasForeignKey("iglid.Models.Team", "LeaderId");
                 });
         }
     }

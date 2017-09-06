@@ -7,7 +7,7 @@ using iglid.Data;
 
 namespace iglid.Migrations
 {
-    [DbContext(typeof(TeamContext))]
+    [DbContext(typeof(GameContext))]
     [Migration("20170818111736_team")]
     partial class team
     {

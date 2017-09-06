@@ -15,15 +15,12 @@ namespace iglid.Controllers
     [Authorize]
     public class GameController : Controller
     {
-        private readonly MatchContext _MatchContext;
         private readonly UserManager<ApplicationUser> _UserManager;
-        private readonly TeamContext _TeamContext;
+        private readonly GameContext _TeamContext;
 
-        public GameController(MatchContext mc,
-            UserManager<ApplicationUser> um,
-            TeamContext tc)
+        public GameController(UserManager<ApplicationUser> um,
+            GameContext tc)
         {
-            _MatchContext = mc;
             _UserManager = um;
             _TeamContext = tc;
         }
@@ -32,7 +29,7 @@ namespace iglid.Controllers
         public IActionResult Index(string id)
         {
             //needs an index view model for each status and team
-            var match = _MatchContext.matches.First(x => x.Id == id);
+            var match = _TeamContext.matches.First(x => x.Id == id);
             if (match == null)
                 return RedirectToAction(nameof(NotFound));
             return View(match);
@@ -43,7 +40,7 @@ namespace iglid.Controllers
         public IActionResult Play()
         {
             List<Match> ret = new List<Match>();
-            foreach (var match in _MatchContext.matches)
+            foreach (var match in _TeamContext.matches)
             {
                 if (match.outcome == outcome.wait)
                     ret.Add(match);
@@ -68,9 +65,9 @@ namespace iglid.Controllers
         public async Task<IActionResult> Create(CreateViewModel model)
         {
             var user = await GetCurrentUserAsync();
-            if (user.Tname == null)
+            if (user.team == null)
                 return RedirectToAction(nameof(Error),MassageId.NoTeam);
-            var team = _TeamContext.teams.First(x => x.TeamName == user.Tname);
+            var team = user.team;
             if (model.Date > DateTime.Now)
                 return Error(MassageId.Error);
             if (team.CanPlay)
@@ -78,25 +75,25 @@ namespace iglid.Controllers
             Match match = new Match(team, model.Date, model.bestof, model.mode);
             match.Id = Utils.randommathid();
             UpdateMatchOnDb(match,team);            
-            await _MatchContext.matches.AddAsync(match);
+            await _TeamContext.matches.AddAsync(match);
             return RedirectToAction("Profile", "Team", team.ID);
         }
 
         [HttpPost]
         public async Task<IActionResult> Join(string id)
         {
-            var match = _MatchContext.matches.Find(id);
+            var match = _TeamContext.matches.Find(id);
             var user = await GetCurrentUserAsync();
-            if (user.Tname == null || match == null)
+            if (user.team == null || match == null)
                 return NotFound();
             if (match.outcome != outcome.pending)
                 return NotFound();
-            var team = _TeamContext.teams.Find(user.Tname);
+            var team = user.team;
             match.t2 = team;
             match.outcome = outcome.progress;
             UpdateMatchOnDb(match, match.t1, match.t2);
-            _MatchContext.matches.Update(match);
-            await _MatchContext.SaveChangesAsync();
+            _TeamContext.matches.Update(match);
+            await _TeamContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index), id);
         }
 
@@ -104,7 +101,13 @@ namespace iglid.Controllers
         public async Task<IActionResult> Report(string id)
         {
             var user = await GetCurrentUserAsync();
-            var match = _MatchContext.matches.Find(id);
+            var match = _TeamContext.matches.Find(id);
+            ViewData["Id"] = id;
+            ReportViewModel model = new ReportViewModel()
+            {
+                t1name = match.t1.TeamName,
+                t2name = match.t2.TeamName
+            };
             if (match == null ||
                 (match.t1.Leader != user || match.t2.Leader != user))
                 return NotFound();            
@@ -114,7 +117,7 @@ namespace iglid.Controllers
         public async Task<IActionResult> Report(ReportViewModel model, string id)
         {
             var user = await GetCurrentUserAsync();
-            var match = _MatchContext.matches.Find(id);
+            var match = _TeamContext.matches.Find(id);            
             if (match == null ||
                 (match.t1.Leader != user || match.t2.Leader != user))
                 return NotFound();
@@ -131,7 +134,7 @@ namespace iglid.Controllers
                     match.outcome = outcome.dispute;
                 UpdateScore(match, match.t1, match.t2,
                     Utils.excepectwin(match.t1.score, match.t2.score));
-                UpdateMatchOnDb(match, match.t1, match.t2);
+                UpdateMatchOnDb(match, match.t1, match.t2);                
                 return RedirectToAction(nameof(Index), id);
             }
             else if (match.outcome == outcome.progress)
@@ -139,14 +142,30 @@ namespace iglid.Controllers
                 match.t1score = model.t1score;
                 match.t2score = model.t2score;
                 UpdateMatchOnDb(match, match.t1, match.t2);
-                _MatchContext.matches.Update(match);                
-                await _MatchContext.SaveChangesAsync();
+                _TeamContext.matches.Update(match);                
+                await _TeamContext.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), id);
             }
             else
                 return NotFound();
 
 
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Dispute(Dispute model, string id)
+        {
+            var match = _TeamContext.matches.Find(id);
+            var user = await GetCurrentUserAsync();
+            if (!Utils.UserInMatch(match, user))
+                return RedirectToAction(nameof(Error), MassageId.Error);
+            if (ModelState.IsValid)
+            {
+                await _TeamContext.Disputes.AddAsync(model);                
+                await _TeamContext.SaveChangesAsync();
+                return RedirectToAction(nameof(Index), match.Id);//we are thinking about you (:
+            }
+            return RedirectToAction(nameof(Index), match.Id);
         }
 
         #region helpers

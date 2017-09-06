@@ -60,7 +60,7 @@ namespace iglid.Controllers
             {
                 HasPassword = await _userManager.HasPasswordAsync(user),
                 HasPSN = user.PSN != null,
-                HasTeam = user.Tname != null
+                HasTeam = user.team != null
             };
             return View(model);
         }

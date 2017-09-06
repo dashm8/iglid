@@ -1,0 +1,30 @@
+@model iglid.Models.Dispute
+
+<form asp-action="View">
+    <div class="form-horizontal">
+        <h4>Dispute</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="link" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="link" class="form-control" />
+                <span asp-validation-for="link" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="massage" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="massage" class="form-control" />
+                <span asp-validation-for="massage" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+

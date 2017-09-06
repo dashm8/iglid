@@ -1,0 +1,39 @@
+@model iglid.Models.Match
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Match</h2>
+@if(Model.outcome == outcome.dispute){
+    @Html.Partial("Dispute")
+}
+<!--Insert maps display-->
+<div>
+    <p>maps here</p>
+</div>
+<!--Insert maps display-->
+<div class="container teamsection">
+    <div class="row">
+        <div class="col-md-6">
+            <p><b>@Model.t1.TeamName</b></p>
+        </div>
+        <div class="col-md-6">
+            <p><b>@Model.t2.TeamName</b></p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            @foreach(var player in Model.t1.players){
+                Html.DisplayFor(modelItem => player.UserName);
+            }
+        </div>
+        <div class="col-md-7">
+            @foreach(var player in Model.t2.players){
+                Html.DisplayFor(modelItem => player.UserName);
+            }
+        </div>
+    </div>
+</div>
+@Html.ActionLink("Report","Report",new {id = Model.Id})
+
+<!--score table displayed here maybe-->

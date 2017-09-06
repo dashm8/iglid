@@ -1,4 +1,5 @@
-﻿using System;
+﻿using iglid.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,6 +26,21 @@ namespace iglid
         public static double excepectwin(int a,int b)
         {
             return 1 / (1 + 10 ^ ((b - a) / 400));
+        }
+
+        public static bool UserInMatch(Match match,ApplicationUser user)
+        {
+            foreach (var player in match.t1.players)//both teams
+            {
+                if (player == user)
+                    return true;
+            }
+            foreach (var player in match.t2.players)
+            {
+                if (player == user)
+                    return true;
+            }
+            return false;
         }
     }
 }
