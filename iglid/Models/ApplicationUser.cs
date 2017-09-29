@@ -13,6 +13,8 @@ namespace iglid.Models
         public int score { get; set; }
         public Team team { get; set; }
         public virtual List<Massage> massages { get; set; }
+        public virtual List<iglid.Models.TournamentsModels.tourInv>
+            tourinvites { get; set; }
         public virtual List<Match> matches { get; set; }
         public bool IsAdmin { get; set; }
     }

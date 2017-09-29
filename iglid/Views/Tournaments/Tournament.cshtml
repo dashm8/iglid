@@ -1,0 +1,100 @@
+@model iglid.Models.TournamentViewModels.TournamentViewModel
+
+@{
+    ViewData["Title"] = "Tournament";
+}
+
+<h3>@Html.DisplayFor(x => x.tourname)</h3>
+
+@if (Model.DidStart)
+{
+    <div class="container">
+        <!--draw tournament-->
+    </div>
+}else
+{
+    if(Model.type == iglid.Models.TournamentsModels.TourEnums.type.onevone) {
+    <table class="table-hover">
+        <thead>
+            <tr>
+                <th>teamname</th>
+                <th>player</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var team in Model.Teams)
+            {
+                <tr>@Html.DisplayFor(x => team.team_name)</tr>
+                <tr>@Html.DisplayFor(x => team.leader)</tr>
+            }
+        </tbody>
+    </table>
+    }
+    if (Model.type == iglid.Models.TournamentsModels.TourEnums.type.twovtwo)
+    {
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>teamname</th>
+                    <th>leader</th>
+                    <th>player</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var team in Model.Teams)
+                {
+                    <tr>@Html.DisplayFor(x => team.team_name)</tr>
+                    <tr>@Html.DisplayFor(x => team.leader)</tr>
+                    <tr>@Html.DisplayFor(x => team.users.Last())</tr>
+                }
+            </tbody>
+        </table>
+    }
+    if (Model.type == iglid.Models.TournamentsModels.TourEnums.type.threevthree)
+    {
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>teamname</th>
+                    <th>leader</th>
+                    <th>player 1</th>
+                    <th>player 2</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var team in Model.Teams)
+                {
+                    <tr>@Html.DisplayFor(x => team.team_name)</tr>
+                    foreach (var player in team.users)
+                    {
+                        <tr>@Html.DisplayFor(x => player)</tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+    if (Model.type == iglid.Models.TournamentsModels.TourEnums.type.fourvfour)
+    {
+        <table class="table-hover">
+            <thead>
+                <tr>
+                    <th>teamname</th>
+                    <th>leader</th>
+                    <th>player 1</th>
+                    <th>player 2</th>
+                    <th>player 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var team in Model.Teams)
+                {
+                    <tr>@Html.DisplayFor(x => team.team_name)</tr>
+                    foreach (var player in team.users)
+                    {
+                        <tr>@Html.DisplayFor(x => player)</tr>
+                    }
+                }
+            </tbody>
+        </table>
+    }
+}

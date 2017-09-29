@@ -56,7 +56,7 @@ namespace iglid.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Massages(long id)
+        public async Task<IActionResult> Messages(long id)
         {
             var user = await GetCurrentUserAsync();
             var team = _context.teams.Find(id);
@@ -224,7 +224,7 @@ namespace iglid.Controllers
             }
             _context.teams.Update(team);
             await _userManager.UpdateAsync(massage.sender);
-            return RedirectToAction(nameof(Massages), team.ID);
+            return RedirectToAction(nameof(Messages), team.ID);
 
         }
 
@@ -235,7 +235,7 @@ namespace iglid.Controllers
             var team = user.team;
             var req = team.requests.Find(x => x.ID == id);
             team.requests.Remove(req);
-            return RedirectToAction(nameof(Massages), team.ID);
+            return RedirectToAction(nameof(Messages), team.ID);
         }
 
         #region helpers

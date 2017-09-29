@@ -18,6 +18,6 @@ namespace iglid.Models
         [MaxLength(150)]
         public string massage { get; set; }
 
-        public Match match { get; set; }
+        public string matchid { get; set; }
     }
 }

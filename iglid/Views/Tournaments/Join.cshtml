@@ -1,0 +1,32 @@
+@model iglid.Models.TournamentsModels.Team
+
+@{
+    ViewData["Title"] = "Join";
+}
+
+<h2>Join</h2>
+
+<form asp-action="View">
+    <div class="form-horizontal">
+        <h4>Team</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="id" class="col-md-2 control-label">team name</label>
+            <div class="col-md-10">
+                <input asp-for="id" class="form-control" />
+                <span asp-validation-for="teamname" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Tournament">Back to List</a>
+</div>
+
